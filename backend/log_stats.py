@@ -1,6 +1,7 @@
 import psutil
 import subprocess
 import re
+import os
 from time import sleep
 
 PATH = 'temp/stats_log.log'
@@ -17,14 +18,14 @@ def get_CPU_temp():
     return temp
 
 def get_memory_stats():
-    stats = list(psutil.virtual_memory()._asdict().values()) #turn bytes into a dict then get values and turn it to a list
+    stats = list(psutil.virtual_memory()) # Convert named tuple to list
     return stats[:4]
 
 def get_disk_stats():
-    return list(psutil.disk_usage('/')._asdict().values()) #turn bytes into a dict then get values and turn it to a list
+    return list(psutil.disk_usage('/')) # Convert named tuple to list
 
 def get_network_stats():
-    stats = list(psutil.net_io_counters()._asdict().values()) #turn bytes into a dict then get values and turn it to a list
+    stats = list(psutil.net_io_counters()) # Convert named tuple to list
     return stats[:4]
 
 def get_system_stats():
@@ -41,16 +42,23 @@ def get_system_stats():
 def write_to_file():
     stats = get_system_stats()
     with open(PATH, 'a') as log_file:
-        buf = '{'
-        for value in stats.values():
-            buf += str(value) + ','
-        buf = buf[:-1] #remove last comma
-        buf += '},'
+        buf = ''
+        for stat in stats.values():
+            print(stat)
+            try: #itterate through array or add a number
+                for data in stat:
+                    buf += str(data) + ','
+            except TypeError:
+                buf += str(stat) + ','
+        
         log_file.write(buf)
 
 def main():
+    os.makedirs(os.path.dirname(PATH), exist_ok=True)
+
     while True:
         write_to_file()
         sleep(1)
 
-main()
+if __name__ == "__main__":
+    main()
