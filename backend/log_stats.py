@@ -10,7 +10,7 @@ def get_CPU_temp():
     msg = None
     err, msg = subprocess.getstatusoutput('vcgencmd measure_temp')
     if not err:
-        m = re.search(r'-?\d\.?\d*', msg)   
+        m = re.search(r'\d+\.\d+', msg)   
         try:
             temp = float(m.group())
         except ValueError: 
