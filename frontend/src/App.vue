@@ -1,37 +1,26 @@
 <template>
-    <h1> {{ name }}</h1>
-    <p v-if="status === 'active'"> User is active</p>
-    <p v-else-if="status==='inactive'">User is inactive</p>
-    <p v-else> User is a fucking moron</p>
-    <h3>Tasks:</h3>
-    <ul>
-        <li v-for="task in tasks" :key="task">{{ task }}</li>
-    </ul>
-
-    <a :href="link">Click for candy</a>
-    <button @click="change_status">Change user status</button>
+    <div v-for="{name, index} in stats" :key="index">
+        <h3>Entry {{ index + 1 }}</h3>
+    </div>
 </template>
 
-<script>
-    export default {
-        data() {
-            return {
-                name: 'John Doe',
-                status: 'active',
-                tasks: ['task1', 'task2', 'task3'],
-                link: 'https://youtube.com',
-            }
-        },
-        methods: {
-            change_status(){
-                if(this.status ==='active'){
-                    this.status ='inactive';
-                } else if(this.status === 'inactive'){
-                    this.status = 'active';
-                }
-            }
+<script setup>
+   import { ref, onMounted } from 'vue';
+
+    const stats = ref([]);
+    const fetchStats = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/stats');
+            const data = await response.json();
+            stats.value = data;
+        } catch (error) {
+            console.error('Error fetching stats:', error);
         }
-    }   
+    };
+
+    onMounted(() => {
+        fetchStats();
+    });
 </script>
 
 <style scoped></style>
