@@ -15,7 +15,11 @@ def get_stats():
         all_stats = []
         with open(LOG_PATH, 'r') as file:
             chunks = file.read().split(',')
-            for i in range(0, len(chunks) - 1, 15): # we ittarate through the chunks of data moving 15 steps at a time cause thats the size of one chunk. the -1 accounts for the last comma which doesnt lead to any data
+            '''
+            we ittarate through the chunks of data moving 15 steps at a time cause thats the size of one chunk.
+            the -1 accounts for the last comma which doesnt lead to any data
+            '''
+            for i in range(0, len(chunks) - 1, 15):               
                 print(chunks[i:i+15])
                 stats = {
                     'cpu_usage': float(chunks[0 + i]),
