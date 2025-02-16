@@ -3,7 +3,7 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
 
 LOG_PATH = 'temp/stats_log.log'
 #Usually the approach is terrible but i think it suits my needs here
@@ -20,7 +20,6 @@ def get_stats():
             the -1 accounts for the last comma which doesnt lead to any data
             '''
             for i in range(0, len(chunks) - 1, 15):               
-                print(chunks[i:i+15])
                 stats = {
                     'cpu_usage': float(chunks[0 + i]),
                     'cpu_temp': float(chunks[1 + i]),
