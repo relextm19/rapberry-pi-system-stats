@@ -29,7 +29,7 @@ def get_network_stats():
     return list(psutil.net_io_counters())[1:4] # Convert named tuple to list
 
 def get_system_stats():
-    sys_stats = [
+    return [
         psutil.cpu_percent(interval=1),
         get_CPU_temp(),
         get_memory_stats(),
@@ -37,7 +37,6 @@ def get_system_stats():
         get_network_stats(),
         psutil.boot_time(),
     ]
-    return sys_stats
 
 def write_to_file(writer):
     writer.writerow(get_system_stats())
