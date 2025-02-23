@@ -1,36 +1,36 @@
 from flask import Flask, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import os
+import csv
+import json
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
-LOG_PATH = 'temp/stats_log.log'
-#Usually the approach is terrible but i think it suits my needs here
-#DATA_SIZE = [1, 1, 4, 4, 4, 1] cpu temp, cpu usage, memory stats, disk stats, network stats, uptime
+LOG_PATH = 'temp/stats_log.csv'
+
+def parse_value(value):
+    #convert string to list if possible
+    try:
+        parsed = json.loads(value)  
+        if isinstance(parsed, list):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+    return value  
 
 @app.route('/api/stats', methods=['GET'])
+@cross_origin()
 def get_stats():
     if os.path.exists(LOG_PATH):
-        all_stats = []
+        stats = [[] for _ in range(6)] #booo! magic number. Its the number of columns in the csv file which is 99.9% not going to change
         with open(LOG_PATH, 'r') as file:
-            chunks = file.read().split(',')
-            '''
-            we ittarate through the chunks of data moving 15 steps at a time cause thats the size of one chunk.
-            the -1 accounts for the last comma which doesnt lead to any data
-            '''
-            for i in range(0, len(chunks) - 1, 15):               
-                stats = {
-                    'cpu_usage': float(chunks[0 + i]),
-                    'cpu_temp': float(chunks[1 + i]),
-                    'memory_stats': chunks[2 + i:6 + i],
-                    'disk_stats': chunks[6 + i:10 + i],
-                    'network_stats': chunks[10 + i:14 + i],
-                    'uptime': float(chunks[14 + i])
-                }
-                all_stats.append(stats)
-        
-        return jsonify(all_stats)    
+            csv_reader = csv.reader(file)
+            for row in csv_reader:
+                for i in range(6):
+                    stats[i].append(parse_value(row[i]))
+        return jsonify(stats)    
     return jsonify([])
 
 if __name__ == '__main__':
