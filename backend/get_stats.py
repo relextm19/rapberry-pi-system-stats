@@ -24,11 +24,11 @@ def parse_value(value):
 @cross_origin()
 def get_stats():
     if os.path.exists(LOG_PATH):
-        stats = [[] for _ in range(6)] #booo! magic number. Its the number of columns in the csv file which is 99.9% not going to change
+        stats = [[] for _ in range(4)] #booo! magic number. Its the number of columns in the csv file which is 99.9% not going to change
         with open(LOG_PATH, 'r') as file:
             csv_reader = csv.reader(file)
             for row in csv_reader:
-                for i in range(6):
+                for i in range(4):
                     stats[i].append(parse_value(row[i]))
         return jsonify(stats)    
     return jsonify([])

@@ -3,10 +3,10 @@ import subprocess
 import re
 import os
 import csv
-from time import sleep
+from time import time, sleep
 
 PATH = 'temp/stats_log.csv'
-HEADERS = ['CPU Usage', 'CPU Temp', 'Memory Usage', 'Disk Usage', 'Network Usage', 'Boot Time']
+HEADERS = ['CPU Stats', 'Memory Stats', 'Network Stats', 'Boot Time']
 
 def get_CPU_temp():
     msg = None
@@ -20,22 +20,22 @@ def get_CPU_temp():
     return temp
 
 def get_memory_stats():
+    #[available_memory, used_memory, percentage_used]
     return list(psutil.virtual_memory())[1:4] # Convert named tuple to list
 
-def get_disk_stats():
-    return list(psutil.disk_usage('/'))[1:4] # Convert named tuple to list
-
 def get_network_stats():
-    return list(psutil.net_io_counters())[1:4] # Convert named tuple to list
+    #[bytes_sent, bytes_received, packets_sent, packets_received]
+    return list(psutil.net_io_counters())[0:4] # Convert named tuple to list
+
+def get_CPU_stats():
+    return [psutil.cpu_percent(interval=1), get_CPU_temp()] 
 
 def get_system_stats():
     return [
-        psutil.cpu_percent(interval=1),
-        get_CPU_temp(),
+        get_CPU_stats(),
         get_memory_stats(),
-        get_disk_stats(),
         get_network_stats(),
-        psutil.boot_time(),
+        f'{(time() - psutil.boot_time()):.2f}',
     ]
 
 def write_to_file(writer):
@@ -43,6 +43,8 @@ def write_to_file(writer):
 
 def main():
     os.makedirs(os.path.dirname(PATH), exist_ok=True)
+    if os.path.exists(PATH):
+        os.remove(PATH)
     FILE = open(PATH, 'a')
     writer = csv.writer(FILE)
     writer.writerow(HEADERS)

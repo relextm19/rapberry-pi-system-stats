@@ -26,7 +26,7 @@
         color: String  // Line color
     });
 
-    const chartTitle = computed(() => props.data[0]); 
+    const chartTitle = computed(() => props.data[0]); //first row is the title of the graph
 
     const chartData = computed(() => ({
         labels: props.data.slice(1).map((_, i) => `${i + 1}s`), // Generate labels (1s, 2s, ...)
