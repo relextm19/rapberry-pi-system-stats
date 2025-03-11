@@ -32,6 +32,3 @@ def get_stats():
                     stats[i].append(parse_value(row[i]))
         return jsonify(stats)    
     return jsonify([])
-
-if __name__ == '__main__':
-    app.run(debug=True)
