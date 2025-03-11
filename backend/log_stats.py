@@ -4,9 +4,10 @@ import re
 import os
 import csv
 from time import time, sleep
+import math
 
 PATH = 'temp/stats_log.csv'
-HEADERS = ['CPU Stats', 'Memory Stats', 'Network Stats', 'Boot Time']
+HEADERS = ['CPU Stats', 'Memory Stats', 'Network Stats', 'Up Time']
 
 def get_CPU_temp():
     msg = None
@@ -20,8 +21,11 @@ def get_CPU_temp():
     return temp
 
 def get_memory_stats():
-    #[available_memory, used_memory, percentage_used]
-    return list(psutil.virtual_memory())[1:4] # Convert named tuple to list
+    #[available_memory, percentage_used, used_memory]
+    stats = list(psutil.virtual_memory())[1:4]
+    stats[0] = float(f"{stats[0] / (1024 ** 3):.2f}")  # Convert bytes to GB 
+    stats[2] = float(f"{stats[2] / (1024 ** 3):.2f}")  # Convert bytes to GB 
+    return stats# Convert named tuple to list
 
 def get_network_stats():
     #[bytes_sent, bytes_received, packets_sent, packets_received]

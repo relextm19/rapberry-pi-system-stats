@@ -1,7 +1,6 @@
 <template>
     <div class="graph-container"> 
-        <h2>{{ props.data[0] }}</h2> <!-- First row is the graph title -->
-        <Line v-if="chartData" :data="chartData" />
+        <Line v-if="chartData" :data="chartData" :options="chartOptions"/>
     </div>
 </template>
 
@@ -39,13 +38,24 @@
             }
         ]
     }));
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false, // stretch the graph across the whole container
+        scales: {
+            x: {
+                ticks: {
+                    color: "#f0f0f0",
+                },
+            },
+            y: {
+                ticks: {
+                    color: "#f0f0f0",
+                },
+            },
+        },
+    };
 </script>
 
 <style scoped>
-    .graph-container {
-        margin-bottom: 20px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-    }
+   
 </style>
