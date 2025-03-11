@@ -22,17 +22,18 @@ def get_CPU_temp():
 
 def get_memory_stats():
     #[available_memory, percentage_used, used_memory]
-    stats = list(psutil.virtual_memory())[1:4]
-    stats[0] = float(f"{stats[0] / (1024 ** 3):.2f}")  # Convert bytes to GB 
-    stats[2] = float(f"{stats[2] / (1024 ** 3):.2f}")  # Convert bytes to GB 
-    return stats# Convert named tuple to list
+    stats = list(psutil.virtual_memory())[1:4] # Convert named tuple to list
+    stats[0] = round(stats[0] / (1024 ** 3), 2)
+    stats[2] = round(stats[2] / (1024 ** 3), 2)
+
+    return stats
 
 def get_network_stats():
     #[bytes_sent, bytes_received, packets_sent, packets_received]
     return list(psutil.net_io_counters())[0:4] # Convert named tuple to list
 
 def get_CPU_stats():
-    return [psutil.cpu_percent(interval=1), get_CPU_temp()] 
+    return [psutil.cpu_percent(interval=1), get_CPU_temp()]  #this sleeps for 1 second which is fine
 
 def get_system_stats():
     return [
@@ -42,8 +43,9 @@ def get_system_stats():
         f'{(time() - psutil.boot_time()):.2f}',
     ]
 
-def write_to_file(writer):
+def write_to_file(writer, file):
     writer.writerow(get_system_stats())
+    file.flush()
 
 def main():
     os.makedirs(os.path.dirname(PATH), exist_ok=True)
@@ -53,9 +55,8 @@ def main():
     writer = csv.writer(FILE)
     writer.writerow(HEADERS)
 
-    while True: 
-        write_to_file(writer)
-        sleep(1)
+    while True: #the loop is slept for 1 second due to the blocking cpu stats call but its fine
+        write_to_file(writer, FILE) 
 
 if __name__ == "__main__":
     main()
